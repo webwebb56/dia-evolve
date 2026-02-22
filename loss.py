@@ -118,7 +118,18 @@ def compute_loss(
         )
 
     # --- Map peptides to species ---
+    # Normalize species_ratios keys to match prior's species column type
     species_col = "species_id" if "species_id" in prior_df.columns else "species_name"
+
+    # Auto-convert species_ratios keys to match prior column type
+    normalized_ratios = {}
+    for cond_key, ratios in species_ratios.items():
+        normalized = {}
+        for k, v in ratios.items():
+            normalized[str(k)] = v
+        normalized_ratios[cond_key] = normalized
+    species_ratios = normalized_ratios
+
     if species_col not in prior_df.columns:
         # Can't compute species metrics without species info
         return LossMetrics(
